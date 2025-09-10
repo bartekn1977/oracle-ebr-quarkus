@@ -67,3 +67,6 @@ If you want to learn more about building native executables, please consult <htt
 Easily start your REST Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+# Oracle EBR
+[https://oracle-base.com/articles/11g/edition-based-redefinition-11gr2#services]
