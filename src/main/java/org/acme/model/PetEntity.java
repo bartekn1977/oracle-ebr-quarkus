@@ -1,6 +1,5 @@
 package org.acme.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -14,7 +13,7 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 
 @Entity
 @Table(name = "PET")
-public class Pet {
+public class PetEntity {
 
     private Long id;
     private String name;
@@ -22,7 +21,7 @@ public class Pet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_ID")
-    private Category category;
+    private CategoryEntity category;
 
     private String status;
 
@@ -57,7 +56,7 @@ public class Pet {
         this.status = status;
     }
 
-    public Category getCategory() {
+    public CategoryEntity getCategory() {
         return category;
     }
 

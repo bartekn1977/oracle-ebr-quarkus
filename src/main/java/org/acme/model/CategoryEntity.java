@@ -14,7 +14,7 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 
 @Entity
 @Table(name = "CATEGORY")
-public class Category {
+public class CategoryEntity {
 
     private Long id;
     private String name;
@@ -31,13 +31,13 @@ public class Category {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.toUpperCase();
     }
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pet> pets;
-
-    public List<Pet> getPets() {
-        return pets;
-    }
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<PetEntity> petEntities;
+//
+//    public List<PetEntity> getPets() {
+//        return petEntities;
+//    }
 }

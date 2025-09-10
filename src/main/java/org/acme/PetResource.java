@@ -9,7 +9,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.acme.model.Pet;
+import org.acme.model.PetEntity;
 
 import java.net.URI;
 import java.util.List;
@@ -22,27 +22,29 @@ public class PetResource {
     @Inject
     PetRepository petRepository;
 
+    @Inject
+    CategoryRepository categoryRepository;
+
     @GET
-    public List<Pet> list() {
+    public List<PetEntity> list() {
         return petRepository.list();
     }
 
     @GET
     @Path("/{id}")
-    public Pet get(Long id) {
+    public PetEntity get(Long id) {
         return petRepository.findById(id);
     }
 
     @POST
-    @Transactional
-    public Response create(Pet pet) {
-        Pet newPet = petRepository.create(pet);
-        return Response.created(URI.create("/pets/" + newPet.getId())).build();
+    public Response create(PetEntity petEntity) {
+        PetEntity newPetEntity = petRepository.create(petEntity);
+        return Response.created(URI.create("/pets/" + newPetEntity.getId())).build();
     }
 
     @GET
     @Path("/search/{name}")
-    public List<Pet> search(String name) {
+    public List<PetEntity> search(String name) {
         return petRepository.findByName(name);
     }
 

@@ -2,29 +2,32 @@ package org.acme;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import org.acme.model.Pet;
+import jakarta.transaction.Transactional;
+import org.acme.model.PetEntity;
 
 import java.util.List;
 
 @ApplicationScoped
-public class PetRepository implements PanacheRepository<Pet> {
+public class PetRepository implements PanacheRepository<PetEntity> {
 
-    public List<Pet> list() {
+    public List<PetEntity> list() {
         return findAll().list();
     }
 
-    public List<Pet> findByStatus(String status) {
-        return find("status", status).list();
+    public List<PetEntity> findByStatus(String status) {
+        return find("status", status.toUpperCase()).list();
     }
 
-    public List<Pet> findByName(String name){
-        return find("name", name).list();
+    public List<PetEntity> findByName(String name){
+        return find("name", name.toUpperCase()).list();
     }
 
-    public Pet findById(String id){
+    public PetEntity findById(String id){
         return find("id", id).firstResult();
     }
-    public Pet create(Pet pet) {
-        return create(pet);
+
+    @Transactional
+    public PetEntity create(PetEntity petEntity) {
+        return create(petEntity);
     }
 }
