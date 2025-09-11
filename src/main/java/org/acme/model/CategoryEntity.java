@@ -1,10 +1,8 @@
 package org.acme.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -19,14 +17,17 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @Table(name = "CATEGORY")
 public class CategoryEntity {
 
+    @Id
+    @GeneratedValue(strategy = SEQUENCE, generator = "categorySeq")
+    @SequenceGenerator(name = "categorySeq", sequenceName = "CATEGORY_SEQ", allocationSize = 1)
     private Long id;
     private String name;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<PetEntity> pets;
 
-    @Id
     @JsonIgnore
-    @SequenceGenerator(name = "CATEGORY_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy = SEQUENCE, generator = "CATEGORY_SEQ")
     public Long getId() {
         return id;
     }
@@ -39,8 +40,6 @@ public class CategoryEntity {
         this.name = name.toUpperCase();
     }
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     public List<PetEntity> getPets() {
         return pets;
     }

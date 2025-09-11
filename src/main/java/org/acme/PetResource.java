@@ -10,6 +10,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.PetDto;
+import org.acme.model.CategoryEntity;
 import org.acme.model.PetEntity;
 
 import java.net.URI;
@@ -44,9 +45,18 @@ public class PetResource {
     }
 
     @POST
-    public Response create(PetEntity petEntity) {
-        PetEntity newPetEntity = petRepository.create(petEntity);
-        return Response.created(URI.create("/pets/" + newPetEntity.getId())).build();
+    @Transactional
+    public Response create(PetDto pet) {
+        PetEntity petEntity = new PetEntity();
+        petEntity.setName(pet.name());
+        petEntity.setTags(pet.tags());
+        petEntity.setStatus(pet.status());
+
+        List<CategoryEntity> categoryEntities = categoryRepository.findByName(pet.category());
+        petEntity.setCategory(categoryEntities.getFirst());
+
+        petRepository.persist(petEntity);
+        return Response.created(URI.create("/pets/" + petEntity.getId())).build();
     }
 
     @GET

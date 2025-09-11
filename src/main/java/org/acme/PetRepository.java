@@ -2,7 +2,6 @@ package org.acme;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 import org.acme.model.PetEntity;
 
 import java.util.List;
@@ -26,8 +25,4 @@ public class PetRepository implements PanacheRepository<PetEntity> {
         return find("id", id).firstResult();
     }
 
-    @Transactional
-    public PetEntity create(PetEntity petEntity) {
-        return create(petEntity);
-    }
 }
