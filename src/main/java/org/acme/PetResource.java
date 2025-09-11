@@ -36,8 +36,8 @@ public class PetResource {
     @POST
     @Transactional
     public Response create(Pet pet) {
-        Pet newPet = petRepository.create(pet);
-        return Response.created(URI.create("/pets/" + newPet.getId())).build();
+        petRepository.persist(pet);
+        return Response.created(URI.create("/pets/" + pet.getId())).build();
     }
 
     @GET

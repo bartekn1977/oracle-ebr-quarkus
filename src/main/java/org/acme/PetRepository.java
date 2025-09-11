@@ -24,7 +24,8 @@ public class PetRepository implements PanacheRepository<Pet> {
     public Pet findById(String id){
         return find("id", id).firstResult();
     }
-    public Pet create(Pet pet) {
-        return create(pet);
-    }
+
+//    public Pet create(Pet pet) {
+//        return create(pet);
+//    }
 }

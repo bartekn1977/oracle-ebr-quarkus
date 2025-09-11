@@ -2,6 +2,7 @@ package org.acme.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -12,15 +13,16 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @Table(name = "PET")
 public class Pet {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "petSeq")
+    @SequenceGenerator(name = "petSeq", sequenceName = "PET_SEQ", allocationSize = 1)
     private Long id;
+
     private String name;
     private String tags;
     private String category;
     private String status;
 
-    @Id
-    @SequenceGenerator(name = "PET_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy=SEQUENCE, generator="PET_SEQ")
     public Long getId() {
         return id;
     }
