@@ -9,6 +9,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.acme.dto.PetDto;
 import org.acme.model.PetEntity;
 
 import java.net.URI;
@@ -32,8 +33,14 @@ public class PetResource {
 
     @GET
     @Path("/{id}")
-    public PetEntity get(Long id) {
-        return petRepository.findById(id);
+    public PetDto get(Long id) {
+        PetEntity pet = petRepository.findById(id);
+        return new PetDto(
+                pet.getName(),
+                pet.getTags(),
+                pet.getStatus(),
+                pet.getCategory().getName()
+        );
     }
 
     @POST

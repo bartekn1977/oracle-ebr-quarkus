@@ -1,7 +1,7 @@
 package org.acme.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -18,12 +18,8 @@ public class PetEntity {
     private Long id;
     private String name;
     private String tags;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CATEGORY_ID")
-    private CategoryEntity category;
-
     private String status;
+    private CategoryEntity category;
 
     @Id
     @SequenceGenerator(name = "PET_SEQ", allocationSize = 1)
@@ -55,7 +51,8 @@ public class PetEntity {
     public void setStatus(String status) {
         this.status = status;
     }
-
+    @ManyToOne
+    @JoinColumn(name = "CATEGORY_ID", nullable = false)
     public CategoryEntity getCategory() {
         return category;
     }
