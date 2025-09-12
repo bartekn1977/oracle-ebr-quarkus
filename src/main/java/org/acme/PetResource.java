@@ -53,7 +53,14 @@ public class PetResource {
         petEntity.setStatus(pet.status());
 
         List<CategoryEntity> categoryEntities = categoryRepository.findByName(pet.category());
-        petEntity.setCategory(categoryEntities.getFirst());
+        if (categoryEntities.isEmpty()) {
+            CategoryEntity newCategoryEntity = new CategoryEntity();
+            newCategoryEntity.setName(pet.category());
+            categoryRepository.persist(newCategoryEntity);
+            petEntity.setCategory(newCategoryEntity);
+        } else {
+            petEntity.setCategory(categoryEntities.getFirst());
+        }
 
         petRepository.persist(petEntity);
         return Response.created(URI.create("/pets/" + petEntity.getId())).build();
