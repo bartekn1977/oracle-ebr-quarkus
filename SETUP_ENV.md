@@ -1,7 +1,12 @@
 # Setup POC database
 
-### add PDB
+### remove in necessary PDB
+```
+alter pluggable database testpdb close IMMEDIATE;
+drop pluggable database testpdb including DATAFILES;
+```
 
+### add PDB
 ```
 create pluggable database testpdb admin user pdbadmin identified by <password>;
 alter pluggable database testpdb open;
@@ -22,6 +27,17 @@ grant create session, create table, create sequence, create view, create procedu
 create bigfile tablespace users;
 create user app_service identified by <password> quota unlimited on users;
 ALTER USER app_schema GRANT CONNECT THROUGH app_service;
+```
+
+### create versions and grant them
+```
+-- V1
+CREATE EDITION V1;
+GRANT USE ON EDITION V1 TO app_schema;
+
+-- V2 based on V1
+CREATE EDITION V2 AS CHILD OF V1;
+GRANT USE ON EDITION V2 TO app_schema;
 ```
 
 ### optionally add service/services
