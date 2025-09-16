@@ -1,5 +1,28 @@
 # Setup POC database
 
+## Docker/Podmab free dataabase
+
+### DOCKER
+https://dev.to/francotel/easily-run-oracle-database-in-docker-898
+```
+docker login container-registry.oracle.com
+docker pull container-registry.oracle.com/database/express:latest
+docker pull container-registry.oracle.com/database/free:latest
+
+```
+alternative
+```
+docker run -d -p 1521:1521 -e ORACLE_PASSWORD=<your password> gvenzl/oracle-free
+docker run -d -p 1521:1521 -e ORACLE_PASSWORD=SomePass1234! -v oracle-volume:/opt/oracle/oradata gvenzl/oracle-free
+```
+
+### PODMAN
+https://container-registry.oracle.com/ords/f?p=113:4:13046393937477:::4:P4_REPOSITORY,AI_REPOSITORY,AI_REPOSITORY_NAME,P4_REPOSITORY_NAME,P4_EULA_ID,P4_BUSINESS_AREA_ID:1863,1863,Oracle%20Database%20Free,Oracle%20Database%20Free,1,0&cs=373YXnRrRRdHJPPjQ9bJ_1BMzDb7XxETcA0FXFRjB_vSjO8pnDnhQhdyuraGUyVLB4PM1_I8kRZotEeqox8lwgw
+```
+podman run -d --name <oracle-db> container-registry.oracle.com/database/free:latest
+```
+
+
 ### remove in necessary PDB
 ```
 alter pluggable database testpdb close IMMEDIATE;
