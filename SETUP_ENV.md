@@ -1,38 +1,67 @@
 # Setup POC database
 
-### remove in necessary PDB
+## Docker/Podman free database
+
+### DOCKER (desktop)
+
+Official Oracle repository databases 
+https://dev.to/francotel/easily-run-oracle-database-in-docker-898
 ```
-alter pluggable database testpdb close IMMEDIATE;
-drop pluggable database testpdb including DATAFILES;
+docker login container-registry.oracle.com
+docker pull container-registry.oracle.com/database/express:latest
+docker pull container-registry.oracle.com/database/free:latest
+
+```
+
+Alternative version
+```
+docker run -d -p 1521:1521 -e ORACLE_PASSWORD=<your password> gvenzl/oracle-free
+docker run -d -p 1521:1521 -e ORACLE_PASSWORD=SomePass1234! -v oracle-volume:/opt/oracle/oradata gvenzl/oracle-free
+```
+
+### PODMAN
+
+Oracle PODMAN version https://podman-desktop.io/
+
+```
+podman run -d --name <oracle-db> container-registry.oracle.com/database/free:latest
+```
+
+## Database preparation
+### remove in necessary old PDB
+```
+ALTER PLUGGABLE DATABASE TESTPDB CLOSE IMMEDIATE;
+DROP PLUGGABLE DATABASE TESTPDB INCLUDING DATAFILES;
 ```
 
 ### add PDB
 ```
-create pluggable database testpdb admin user pdbadmin identified by <password>;
-alter pluggable database testpdb open;
-alter pluggable database testpdb save state;
+CREATE PLUGGABLE DATABASE TESTPDB ADMIN USER PDBADMIN IDENTIFIED BY <password>;
+ALTER PLUGGABLE DATABASE TESTPDB OPEN;
+ALTER PLUGGABLE DATABASE TESTPDB SAVE STATE;
 ```
 
-### add Schema
+### add Schema user
 ```
-alter session set container = testpdb;
-create bigfile tablespace app_tbs;
-create user app_schema quota unlimited on app_tbs DEFAULT TABLESPACE app_tbs;
+ALTER SESSION SET CONTAINER = TESTPDB;
+CREATE BIGFILE TABLESPACE APP_TBS;
+CREATE USER app_schema QUOTA UNLIMITED ON APP_TBS DEFAULT TABLESPACE APP_TBS;
 ALTER USER app_schema ENABLE EDITIONS;
-grant create session, create table, create sequence, create view, create procedure, create trigger, CREATE MATERIALIZED VIEW, CREATE ANY EDITION, DROP ANY EDITION to app_schema;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW, CREATE PROCEDURE, CREATE TRIGGER, CREATE MATERIALIZED VIEW, CREATE ANY EDITION, DROP ANY EDITION TO app_schema;
 ```
 
-### add app user, proxy for schema
+### add application user, proxy for schema
 ```
-create bigfile tablespace users;
-create user app_service identified by <password> quota unlimited on users;
-ALTER USER app_schema GRANT CONNECT THROUGH app_service;
+CREATE BIGFILE TABLESPACE USERS;
+CREATE USER app_service_user IDENTIFIED BY <password> QUOTA UNLIMITED ON USERS;
+ALTER USER app_schema GRANT CONNECT THROUGH app_service_user;
 ```
 
 ### create versions and grant them
 ```
 -- V1
 CREATE EDITION V1;
+ALTER DATABASE DEFAULT EDITION = V1;
 GRANT USE ON EDITION V1 TO app_schema;
 
 -- V2 based on V1
@@ -66,7 +95,7 @@ End;
 exec DBMS_SERVICE.START_SERVICE('testpdb_service_v2');
 
 
-SELECT name, edition FROM dba_services;
+SELECT NAME, EDITION FROM DBA_SERVICES;
 exec DBMS_SERVICE.STOP_SERVICE('testpdb_service_v2');
 exec DBMS_SERVICE.DELETE_SERVICE('testpdb_service_v2');
 
@@ -74,5 +103,7 @@ exec DBMS_SERVICE.DELETE_SERVICE('testpdb_service_v2');
 
 ### test connections
 ```
-CONN app_service[app_schema]/<password>@//localhost:1521/testpdb_service
+CONN app_service_user[app_schema]/<password>@//localhost:1521/testpdb_service
+CONN app_service_user[app_schema]/<password>@//localhost:1521/testpdb_service_v1
+CONN app_service_user[app_schema]/<password>@//localhost:1521/testpdb_service_v2
 ```
