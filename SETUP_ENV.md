@@ -15,8 +15,11 @@ docker pull container-registry.oracle.com/database/free:latest
 
 Alternative version
 ```
-docker run -d -p 1521:1521 -e ORACLE_PASSWORD=<your password> gvenzl/oracle-free
-docker run -d -p 1521:1521 -e ORACLE_PASSWORD=SomePass1234! -v oracle-volume:/opt/oracle/oradata gvenzl/oracle-free
+docker run -d --name oracle-ebr-demo -p <local port>:1521 -e ORACLE_PASSWORD=<your password> gvenzl/oracle-free
+docker run -d --name oracle-ebr-demo -p <local port>:1521 -e ORACLE_PASSWORD=<your password> -v <path to folder>:/opt/oracle/oradata gvenzl/oracle-free
+
+docker run -d --name oracle-ebr-demo -p 5521:1521 -e ORACLE_PASSWORD=<your password> -v c:\\Workspace\\docker\\oradata2:/opt/oracle/oradata gvenzl/oracle-free
+
 ```
 
 ### PODMAN
@@ -24,7 +27,13 @@ docker run -d -p 1521:1521 -e ORACLE_PASSWORD=SomePass1234! -v oracle-volume:/op
 Oracle PODMAN version https://podman-desktop.io/
 
 ```
-podman run -d --name <oracle-db> container-registry.oracle.com/database/free:latest
+podman run -d --name oracle-ebr-demo -p <local port>:1521 container-registry.oracle.com/database/free:latest
+
+# or
+
+podman run -d --name oracle-ebr-demo -p <local port>:1521 -e ORACLE_PASSWORD=<your password> -v <path to folder>:/opt/oracle/oradata gvenzl/oracle-free
+
+
 ```
 
 ## Database preparation
