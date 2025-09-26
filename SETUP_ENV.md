@@ -15,8 +15,8 @@ docker pull container-registry.oracle.com/database/free:latest
 
 Alternative version
 ```
-docker run -d -p 1521:1521 -e ORACLE_PASSWORD=<your password> gvenzl/oracle-free
-docker run -d -p 1521:1521 -e ORACLE_PASSWORD=SomePass1234! -v oracle-volume:/opt/oracle/oradata gvenzl/oracle-free
+docker run -d --name oracle-ebr-demo -p 1521:1521 -e ORACLE_PASSWORD=<your password> gvenzl/oracle-free
+docker run -d --name oracle-ebr-demo -p 1521:1521 -e ORACLE_PASSWORD=<your password> -v oracle-volume:/opt/oracle/oradata gvenzl/oracle-free
 ```
 
 ### PODMAN
@@ -28,6 +28,55 @@ podman run -d --name <oracle-db> container-registry.oracle.com/database/free:lat
 ```
 
 ## Database preparation
+
+### SQL Tool
+https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+
+### Init script init.sql
+```
+sql sys/<pass>@localhost:<local_port>/FREE as sysdba
+
+-- create PDB
+ALTER PLUGGABLE DATABASE TESTPDB CLOSE IMMEDIATE;
+DROP PLUGGABLE DATABASE TESTPDB INCLUDING DATAFILES;
+CREATE PLUGGABLE DATABASE TESTPDB ADMIN USER PDBADMIN IDENTIFIED BY &pdbadmin_password create_file_dest='/opt/oracle/oradata';
+ALTER PLUGGABLE DATABASE TESTPDB OPEN;
+ALTER PLUGGABLE DATABASE TESTPDB SAVE STATE;
+
+-- setup schema
+ALTER SESSION SET CONTAINER = TESTPDB;
+CREATE BIGFILE TABLESPACE APP_TBS;
+CREATE USER app_schema QUOTA UNLIMITED ON APP_TBS DEFAULT TABLESPACE APP_TBS;
+ALTER USER app_schema ENABLE EDITIONS;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW, CREATE PROCEDURE, CREATE TRIGGER, CREATE MATERIALIZED VIEW, CREATE ANY EDITION, DROP ANY EDITION TO app_schema;
+
+-- setup connection user
+CREATE BIGFILE TABLESPACE USERS;
+CREATE USER app_service_user IDENTIFIED BY &app_service_user_password QUOTA UNLIMITED ON USERS;
+ALTER USER app_schema GRANT CONNECT THROUGH app_service_user;
+
+-- create service
+exec DBMS_SERVICE.CREATE_SERVICE('testpdb_service','testpdb_service');
+exec DBMS_SERVICE.START_SERVICE('testpdb_service');
+
+-- create initial version V1
+CREATE EDITION V1;
+ALTER DATABASE DEFAULT EDITION = V1;
+GRANT USE ON EDITION V1 TO app_schema;
+
+-- create V1 only service
+BEGIN
+    DBMS_SERVICE.CREATE_SERVICE(
+    service_name => 'testpdb_service_v1',
+    network_name => 'testpdb_service_v1',
+    edition      => 'V1');
+End;
+/
+exec DBMS_SERVICE.START_SERVICE('testpdb_service_v1');
+
+```
+## Individual steps
+
 ### remove in necessary old PDB
 ```
 ALTER PLUGGABLE DATABASE TESTPDB CLOSE IMMEDIATE;
